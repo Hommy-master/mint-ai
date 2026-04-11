@@ -77,11 +77,11 @@ services:
       - SERVER_NAME=localhost
       - PROXY_PASS_URL_1=http://capcut-mate:30000/openapi/capcut-mate/
       - PROXY_LOCATION_1=/openapi/capcut-mate/
-      - PROXY_PASS_URL_2=http://127.0.0.1:30000/openapi/capcut-mate/v1/gen_video
+      - PROXY_PASS_URL_2=http://192.168.2.208:30000/openapi/capcut-mate/v1/gen_video
       - PROXY_LOCATION_2=/openapi/capcut-mate/v1/gen_video
-      - PROXY_PASS_URL_3=http://127.0.0.1:30000/openapi/capcut-mate/v1/gen_video_status
+      - PROXY_PASS_URL_3=http://192.168.3.208:30000/openapi/capcut-mate/v1/gen_video_status
       - PROXY_LOCATION_3=/openapi/capcut-mate/v1/gen_video_status
-      - PROXY_PASS_URL_4=http://127.0.0.1:30000/openapi/capcut-mate/v1/gen_video_active_count
+      - PROXY_PASS_URL_4=http://192.168.3.208:30000/openapi/capcut-mate/v1/gen_video_active_count
       - PROXY_LOCATION_4=/openapi/capcut-mate/v1/gen_video_active_count
       - PROXY_PASS_URL_5=http://mint-ai:30000/openapi/mint-ai/
       - PROXY_LOCATION_5=/openapi/mint-ai/
