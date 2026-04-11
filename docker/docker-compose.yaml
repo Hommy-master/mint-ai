@@ -54,8 +54,8 @@ services:
     volumes:
       - ./html/output:/app/output
     environment:
-      - DRAFT_URL=http://127.0.0.1/openapi/capcut-mate/v1/get_draft
-      - DOWNLOAD_URL=http://127.0.0.1
+      - DRAFT_URL=http://192.168.3.165/openapi/capcut-mate/v1/get_draft
+      - DOWNLOAD_URL=http://192.168.3.165
       - TIP_URL=https://docs.jcaigc.cn
       - DOWNLOAD_FILE_SIZE_LIMIT=1073741824
     networks:
