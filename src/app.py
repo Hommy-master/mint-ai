@@ -26,6 +26,6 @@ app.include_router(v1_router, prefix="/openapi/mint-ai/v1")
 logger.info("Mint-AI application loaded")
 
 
-@app.get("/health", tags=["health"])
+@app.get("/openapi/health", tags=["health"])
 async def health() -> dict[str, str]:
     return {"status": "ok"}

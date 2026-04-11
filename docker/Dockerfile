@@ -24,8 +24,9 @@ RUN uv sync --frozen --no-dev
 COPY main.py ./
 COPY src/ ./src/
 
-# 仓库内 app/bin（如 ffprobe、ffmpeg 静态/自带二进制）加入 PATH，供 ffmpeg 模块子进程调用
-RUN cp tools/* /usr/local/bin/ && chmod +x /usr/local/bin/ffmpeg && chmod +x /usr/local/bin/ffprobe
+# 若需在镜像内使用仓库自带的静态 ffmpeg，可取消注释并确保构建上下文包含 tools/：
+# COPY tools/ffmpeg tools/ffprobe /usr/local/bin/
+# RUN chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe
 
 # 创建数据目录
 RUN mkdir -p /app/data /app/temp
@@ -33,7 +34,7 @@ RUN mkdir -p /app/data /app/temp
 # 暴露服务端口
 EXPOSE 30000
 
-# 健康检查
+# 健康检查（应用路由为 GET /openapi/health）
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:30000/openapi/health || exit 1
 
