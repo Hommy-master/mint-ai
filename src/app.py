@@ -5,7 +5,7 @@ from api.v1.router import router as v1_router
 
 app = FastAPI(
     title="Mint-AI API",
-    description="输入视频一键成片 — OpenAPI `/openapi/v1` 为业务前缀，与 `/openapi.json` 规范路径不同。",
+    description="输入视频一键成片 — 业务前缀 `/openapi/mint-ai/v1`，与 `/openapi.json` 规范路径不同。",
     version="0.1.0",
 )
 
@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(v1_router, prefix="/openapi/v1")
+app.include_router(v1_router, prefix="/openapi/mint-ai/v1")
 
 
 @app.get("/health", tags=["health"])
