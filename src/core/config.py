@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     llm_api_base: str = ""
     llm_api_key: str = ""
 
+    log_level: str = "INFO"
+    log_dir: str = "logs"
+    log_file: str = "mint-ai.log"
+    log_max_bytes: int = 10 * 1024 * 1024
+    log_backup_count: int = 5
+
 
 @lru_cache
 def get_settings() -> Settings:

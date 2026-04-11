@@ -13,28 +13,32 @@ _src = Path(__file__).resolve().parent / "src"
 if str(_src) not in sys.path:
     sys.path.insert(0, str(_src))
 
+from core.logger import get_logger, setup_logging
 
-def print_routes() -> None:
+setup_logging()
+logger = get_logger(__name__)
+
+
+def log_registered_routes() -> None:
     from app import app as fastapi_app
 
-    print("Registered routes:", flush=True)
+    logger.info("Registered routes:")
     for route in fastapi_app.routes:
         if isinstance(route, APIRoute):
             methods = sorted(m for m in route.methods if m != "HEAD")
             line = f"  {'|'.join(methods):12} {route.path}"
             if route.name:
                 line += f"  [{route.name}]"
-            print(line, flush=True)
+            logger.info(line)
         elif isinstance(route, Mount):
-            print(f"  {'MOUNT':12} {route.path}", flush=True)
+            logger.info(f"  {'MOUNT':12} {route.path}")
         else:
             path = getattr(route, "path", "")
-            print(f"  {type(route).__name__:12} {path}", flush=True)
-    print(flush=True)
+            logger.info(f"  {type(route).__name__:12} {path}")
 
 
 if __name__ == "__main__":
-    print_routes()
+    log_registered_routes()
     uvicorn.run(
         "app:app",
         host="0.0.0.0",

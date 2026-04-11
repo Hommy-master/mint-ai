@@ -4,8 +4,11 @@ import asyncio
 import uuid
 from dataclasses import dataclass
 
+from core.logger import get_logger
 from schemas.tasks import TaskQueryData, TaskStatus
 from services.pipeline.runner import run_pipeline
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -29,6 +32,7 @@ class TaskService:
         task_id = str(uuid.uuid4())
         async with self._lock:
             self._tasks[task_id] = TaskRecord(task_id=task_id, video_url=video_url)
+        logger.info("task created: %s", task_id)
         asyncio.create_task(self._run_pipeline(task_id))
         return task_id
 
@@ -58,6 +62,7 @@ class TaskService:
         try:
             await run_pipeline(self, task_id)
         except Exception as e:
+            logger.exception("pipeline failed: %s", task_id)
             await self.patch(
                 task_id,
                 status=TaskStatus.failed,
