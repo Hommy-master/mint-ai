@@ -8,6 +8,7 @@ __pycache__/
 .github/
 .gitignore
 *.md
+!README.md
 docs/
 tests/
 .env
