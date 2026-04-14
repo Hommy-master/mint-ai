@@ -14,8 +14,6 @@ func (s *sMiddleware) Auth(r *ghttp.Request) {
 		"/openapi/v1/user/auth/qrcode":        true,
 		"/openapi/v1/user/auth/qrcode/status": true,
 		"/openapi/v1/user/pay/wechat-notify":  true,
-		"/openapi/v1/user/points":             true, // 外部插件调用，根据apiKey查询用户积分，不进行认证
-		"/openapi/v1/user/points/deduct":      true, // 外部插件调用，根据apiKey扣除用户积分，不进行认证
 	}
 
 	// 获取当前请求路径和方法
@@ -24,10 +22,7 @@ func (s *sMiddleware) Auth(r *ghttp.Request) {
 	glog.Infof(r.Context(), "current path: %s, method: %s", currentPath, currentMethod)
 
 	// 检查当前路径是否需要排除认证
-	// 对于 /openapi/v1/bots 路径，只有GET请求不需要认证
-	if _, excluded := excludedPaths[currentPath]; excluded ||
-		(currentPath == "/openapi/v1/bots" && currentMethod == "GET") ||
-		(currentPath == "/openapi/v1/bots/top" && currentMethod == "GET") {
+	if _, excluded := excludedPaths[currentPath]; excluded {
 		r.Middleware.Next()
 		return
 	}

@@ -18,7 +18,6 @@ func ModelUserToTypesUser(u *model.User) *types.User {
 		Points:      u.Points,
 		WeChatID:    u.WeChatID,
 		Role:        u.Role,
-		APIKey:      u.APIKey,
 		VIPLevel:    u.VIPLevel,
 		VIPExpireAt: u.VIPExpireAt,
 		ReferrerID:  u.ReferrerID,
@@ -39,7 +38,6 @@ func TypesUserToModelUser(u *types.User) *model.User {
 	res.Points = u.Points
 	res.WeChatID = u.WeChatID
 	res.Role = u.Role
-	res.APIKey = u.APIKey
 	res.VIPLevel = u.VIPLevel
 	res.VIPExpireAt = u.VIPExpireAt
 	res.ReferrerID = u.ReferrerID

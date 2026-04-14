@@ -128,7 +128,7 @@ func (c *ControllerV1) QueryUser(ctx context.Context, req *v1.QueryUserReq) (*v1
 func (c *ControllerV1) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (*v1.UpdateUserRes, error) {
 	glog.Debugf(ctx, "UpdateUser req: %+v", *req)
 
-	err := user.UpdateUser(ctx, req.ID, req.Name, req.APIKey)
+	err := user.UpdateUser(ctx, req.ID, req.Name)
 	if err != nil {
 		glog.Warningf(ctx, "UpdateUser error: %v", err)
 		return nil, err
@@ -184,7 +184,7 @@ func (c *ControllerV1) BalanceLog(ctx context.Context, req *v1.BalanceLogReq) (*
 }
 
 func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.QueryRes, err error) {
-	pt, err := user.Query(ctx, req.APIKey)
+	pt, err := user.Query(ctx)
 	if err != nil {
 		glog.Warningf(ctx, "points.Query error: %v", err)
 		return nil, err
@@ -194,7 +194,7 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 }
 
 func (c *ControllerV1) Deduct(ctx context.Context, req *v1.DeductReq) (res *v1.DeductRes, err error) {
-	err = user.Deduct(ctx, req.APIKey, req.Points, req.Desc)
+	err = user.Deduct(ctx, req.Points, req.Desc)
 	if err != nil {
 		glog.Warningf(ctx, "points.Deduct error: %v", err)
 		return nil, err

@@ -97,7 +97,6 @@ type UpdateUserReq struct {
 	g.Meta `path:"/" method:"post" tags:"用户管理" summary:"更新用户信息" dc:"根据用户ID更新用户信息"`
 	ID     uint    `json:"id" v:"required|min:1" dc:"用户ID"`
 	Name   *string `json:"name" v:"length:1,64" dc:"用户名"`
-	APIKey *string `json:"apiKey" v:"size:36" dc:"API Key"`
 }
 
 type UpdateUserRes struct {
@@ -146,8 +145,7 @@ type BalanceLogRes struct {
 
 // 查询用户积分
 type QueryReq struct {
-	g.Meta `path:"/points" method:"get" tags:"查询用户积分" summary:"查询用户积分" dc:"根据APIKey查询用户积分, 需要保证APIKey正确"`
-	APIKey string `query:"apiKey" v:"required|size:36" dc:"APIKey"`
+	g.Meta `path:"/points" method:"get" tags:"查询用户积分" summary:"查询用户积分" dc:"基于JWT登录态查询当前用户积分"`
 }
 
 type QueryRes struct {
@@ -155,8 +153,7 @@ type QueryRes struct {
 }
 
 type DeductReq struct {
-	g.Meta `path:"/points/deduct" method:"post" tags:"扣除用户积分" summary:"扣除用户积分" dc:"根据APIKey扣除用户积分, 需要保证APIKey正确"`
-	APIKey string  `json:"apiKey" v:"required|size:36" dc:"APIKey"`
+	g.Meta `path:"/points/deduct" method:"post" tags:"扣除用户积分" summary:"扣除用户积分" dc:"基于JWT登录态扣除当前用户积分"`
 	Points float64 `json:"points" v:"required|float|between:0,1000" dc:"当前消耗积分，必需是一个正数"`
 	Desc   string  `json:"desc" v:"required|length:1,128" dc:"当前消耗积分描述，是什么场景下消耗积分"`
 }

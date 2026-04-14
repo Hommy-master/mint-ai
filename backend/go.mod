@@ -9,7 +9,6 @@ require (
 	github.com/go-cmd/cmd v1.4.3
 	github.com/gogf/gf/v2 v2.5.6
 	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/google/uuid v1.6.0
 	github.com/panjf2000/ants/v2 v2.11.3
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/silenceper/wechat/v2 v2.1.8

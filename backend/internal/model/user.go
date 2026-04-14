@@ -19,7 +19,6 @@ type User struct {
 	WeChatID    string    `gorm:"column:wechat_id;type:varchar(64);not_null;uniqueIndex"` // 关联微信 ID
 	Email       string    `gorm:"column:email;type:varchar(256);default:null"`            // 邮箱
 	Role        string    `gorm:"column:role;type:varchar(32);default:'normal'"`          // 角色（normal:普通用户 creator:创作者 admin:管理员）
-	APIKey      string    `gorm:"column:api_key;type:varchar(64);not_null"`               // API 密钥
 	Points      float64   `gorm:"column:points;type:decimal(10,6);default:1"`             // 积分余额
 	VIPLevel    int       `gorm:"column:vip_level;type:int;default:0;index"`              // VIP等级（0:非VIP 1:VIP_YEAR 2:SVIP_MONTH 3:SVIP_YEAR）
 	VIPExpireAt time.Time `gorm:"column:vip_expire_at;index;default:0001-01-01 00:00:00"` // VIP到期时间

@@ -13,7 +13,6 @@ type User struct {
 	Points      float64   `json:"points" dc:"积分/资源点"`                                        // 单位：元
 	WeChatID    string    `json:"wechatID" dc:"关联微信, 即微信的OpenID"`                            // 微信ID，最大长度为255个字符
 	Role        string    `json:"role" dc:"角色，取值：normal: 普通用户, creator: 智能体创建者, admin: 管理员"` // 用户角色，主要用于控制哪些用户可以创建智能体
-	APIKey      string    `json:"apiKey" dc:"API Key, 用于调用API的密钥"`                           // API 密钥
 	VIPLevel    int       `json:"vipLevel" dc:"VIP等级 (0:非VIP 1:VIP1 2:VIP2) "`               // VIP等级（0:非VIP 1:VIP1 2:VIP2）
 	VIPExpireAt time.Time `json:"vipExpireAt" dc:"VIP到期时间"`                                  // VIP到期时间
 	ReferrerID  uint      `json:"referrerID" dc:"推荐人ID"`

@@ -23,7 +23,6 @@ import (
 	"github.com/dchest/captcha"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/google/uuid"
 	"github.com/silenceper/wechat/v2"
 	"gorm.io/gorm"
 )
@@ -95,7 +94,6 @@ func AuthLogin(ctx context.Context, phone string, pass string) (*types.User, err
 		u.Phone = phone
 		u.Pass = util.MD5(pass)
 		u.Name = "User" + phone
-		u.APIKey = uuid.New().String()
 		err = db.Model(&model.User{}).Create(&u).Error
 		if err != nil {
 			glog.Errorf(ctx, "create user failed: %+v", err)
@@ -109,7 +107,7 @@ func AuthLogin(ctx context.Context, phone string, pass string) (*types.User, err
 		}
 
 		glog.Infof(ctx, "login success, phone: %s, ip: %s", phone, g.RequestFromCtx(ctx).GetClientIp())
-		return &types.User{ID: u.ID, Name: u.Name, Phone: u.Phone, Points: u.Points, Email: u.Email, WeChatID: u.WeChatID, APIKey: u.APIKey}, nil
+		return &types.User{ID: u.ID, Name: u.Name, Phone: u.Phone, Points: u.Points, Email: u.Email, WeChatID: u.WeChatID}, nil
 	}
 
 	if u.Pass != util.MD5(pass) {
@@ -118,7 +116,7 @@ func AuthLogin(ctx context.Context, phone string, pass string) (*types.User, err
 	}
 
 	glog.Infof(ctx, "login success, phone: %s, ip: %s", phone, g.RequestFromCtx(ctx).GetClientIp())
-	return &types.User{ID: u.ID, Name: u.Name, Phone: u.Phone, Points: u.Points, Email: u.Email, WeChatID: u.WeChatID, APIKey: u.APIKey}, nil
+	return &types.User{ID: u.ID, Name: u.Name, Phone: u.Phone, Points: u.Points, Email: u.Email, WeChatID: u.WeChatID}, nil
 }
 
 func Check(ctx context.Context, phone string) (bool, error) {
@@ -241,7 +239,7 @@ func QueryUser(ctx context.Context, id uint) (*types.User, error) {
 	return helper.ModelUserToTypesUser(&u), nil
 }
 
-func UpdateUser(ctx context.Context, id uint, name *string, apiKey *string) error {
+func UpdateUser(ctx context.Context, id uint, name *string) error {
 	fields := []string{}
 	var u model.User
 
@@ -250,11 +248,6 @@ func UpdateUser(ctx context.Context, id uint, name *string, apiKey *string) erro
 	if name != nil {
 		u.Name = *name
 		fields = append(fields, "name")
-	}
-
-	if apiKey != nil {
-		u.APIKey = *apiKey
-		fields = append(fields, "api_key")
 	}
 
 	if len(fields) == 0 {
@@ -279,31 +272,32 @@ func UpdateUser(ctx context.Context, id uint, name *string, apiKey *string) erro
 
 // @brief 查询用户积分
 // @param ctx HTTP请求上下文
-// @param apiKey 用户调用API使用的Key
+// @param ctx HTTP请求上下文
 // @return 积分数，错误信息
-func Query(ctx context.Context, apiKey string) (float64, error) {
-	usr, err := db.GetUserByAPIKey(ctx, apiKey)
+func Query(ctx context.Context) (float64, error) {
+	id := ctx.Value("id").(uint)
+	usr, err := db.GetUserByID(ctx, id)
 	if err != nil {
-		glog.Warningf(ctx, "db.GetUserByAPIKey failed, apiKey: %s, error: %v", apiKey, err)
-		return 0, i.T(ctx, errcode.CodeInvalidAPIKey)
+		glog.Warningf(ctx, "db.GetUserByID failed, id: %d, error: %v", id, err)
+		return 0, i.T(ctx, errcode.CodeUserNotFound)
 	}
 
-	glog.Infof(ctx, "db.GetUserByAPIKey success, apiKey: %s, user: %+v", apiKey, usr)
+	glog.Infof(ctx, "db.GetUserByID success, id: %d, user: %+v", id, usr)
 	return usr.Points, nil
 }
 
 // @brief 减少用户积分
 // @param ctx HTTP请求上下文
-// @param apiKey 用户调用API使用的Key
 // @param points 待扣除的积分数
 // @param desc 扣除积分的理由，什么场景下扣除的积分
 // @return 错误信息
-func Deduct(ctx context.Context, apiKey string, points float64, desc string) error {
+func Deduct(ctx context.Context, points float64, desc string) error {
 	// 1. 查询用户信息
-	usr, err := db.GetUserByAPIKey(ctx, apiKey)
+	id := ctx.Value("id").(uint)
+	usr, err := db.GetUserByID(ctx, id)
 	if err != nil {
-		glog.Warningf(ctx, "db.GetUserByAPIKey failed, apiKey: %s, error: %v", apiKey, err)
-		return i.T(ctx, errcode.CodeInvalidAPIKey)
+		glog.Warningf(ctx, "db.GetUserByID failed, id: %d, error: %v", id, err)
+		return i.T(ctx, errcode.CodeUserNotFound)
 	}
 
 	// 2. 根据用户VIP等级和有效期计算实际扣费
@@ -337,11 +331,11 @@ func Deduct(ctx context.Context, apiKey string, points float64, desc string) err
 	// 4. 扣除积分 & 增加用户消费记录
 	err = db.UpdateUserPoints(ctx, usr.ID, -actualPoints, finalDesc, "")
 	if err != nil {
-		glog.Warningf(ctx, "Update user points failed, apiKey: %s, original points: %f, actual points: %f, desc: %s, err: %+v",
-			apiKey, points, actualPoints, finalDesc, err)
+		glog.Warningf(ctx, "Update user points failed, id: %d, original points: %f, actual points: %f, desc: %s, err: %+v",
+			id, points, actualPoints, finalDesc, err)
 		return i.T(ctx, errcode.CodeInternalServerError)
 	}
 
-	glog.Infof(ctx, "Update user points success, apiKey: %s, original points: %f, actual points: %f, desc: %s", apiKey, points, actualPoints, finalDesc)
+	glog.Infof(ctx, "Update user points success, id: %d, original points: %f, actual points: %f, desc: %s", id, points, actualPoints, finalDesc)
 	return nil
 }

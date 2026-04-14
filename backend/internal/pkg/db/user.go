@@ -12,19 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetUserByAPIKey(ctx context.Context, apiKey string) (*model.User, error) {
-	// 从数据库中查询用户信息
-	var user model.User
-
-	err := NewDB().Where("api_key = ?", apiKey).First(&user).Error
-	if err != nil {
-		glog.Warningf(ctx, "query user failed, err: %+v, apiKey: %s", err, apiKey)
-		return nil, fmt.Errorf("query user failed")
-	}
-
-	return &user, nil
-}
-
 func GetUserByOpenID(ctx context.Context, openID string) (*model.User, error) {
 	// 从数据库中查询用户信息
 	var user model.User
@@ -132,24 +119,6 @@ func CheckUserPoints(ctx context.Context, price float64) (*model.User, error) {
 	// 2. 检查用户积分是否足够
 	if u.Points < price {
 		glog.Warningf(ctx, "user points not enough, userID: %d, points: %.2f, price: %.2f", userID, u.Points, price)
-		return nil, fmt.Errorf("user points not enough")
-	}
-
-	return u, nil
-}
-
-// 检查用户积分是否足够，如果足够，则返回nil，否则返回相应错误，注意：只有用户积分足够，才会返回用户信息
-func CheckUserPointsByAPIKey(ctx context.Context, apiKey string, price float64) (*model.User, error) {
-	// 1. 从数据库中查询用户信息
-	u, err := GetUserByAPIKey(ctx, apiKey)
-	if err != nil {
-		glog.Warningf(ctx, "get user failed, err: %+v, apiKey: %s", err, apiKey)
-		return nil, fmt.Errorf("get user failed")
-	}
-
-	// 2. 检查用户积分是否足够
-	if u.Points < price {
-		glog.Warningf(ctx, "user points not enough, userID: %d, points: %.2f, price: %.2f", u.ID, u.Points, price)
 		return nil, fmt.Errorf("user points not enough")
 	}
 

@@ -9,8 +9,6 @@ import (
 	"cozeos/internal/types"
 	"fmt"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // 获取随机验证码，返回一张图片，可以用HTML的<img>标签显示
@@ -24,7 +22,6 @@ func Scan(ctx context.Context, wxGate *types.WXGate) error {
 		WeChatID:    openID,
 		Name:        "jcaigc-" + openID,
 		Phone:       "jcaigc-" + openID,
-		APIKey:      uuid.New().String(),
 		VIPLevel:    0,
 		VIPExpireAt: time.Now(),
 	})

@@ -31,6 +31,14 @@ func start(ctx context.Context, cfgPath string) error {
 		return err
 	}
 
+	// 同步删除已废弃字段，确保users表不再保留api_key列。
+	if conn.Migrator().HasColumn(&model.User{}, "api_key") {
+		if err := conn.Migrator().DropColumn(&model.User{}, "api_key"); err != nil {
+			glog.Errorf(ctx, "drop users.api_key failed: %v", err)
+			return err
+		}
+	}
+
 	for _, m := range models {
 		if err := setAutoIncrementStart(conn, m, model.AUTO_INCREMENT); err != nil {
 			glog.Warningf(ctx, "set auto increment start failed, model: %T, err: %v", m, err)
