@@ -1,7 +1,5 @@
 services:
   mint-ai:
-    # docker login --username=taohongmin@sina.cn crpi-70qzhn1dtv3eo91r.cn-hangzhou.personal.cr.aliyuncs.com
-    # 需要先登录，密码为：大写字母 + 小写字母 + 6位数字
     image: gogoshine/mint-ai:latest
     container_name: mint-ai
     ports:
