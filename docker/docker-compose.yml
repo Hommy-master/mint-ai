@@ -1,0 +1,21 @@
+services:
+  mint-ai:
+    # docker login --username=taohongmin@sina.cn crpi-70qzhn1dtv3eo91r.cn-hangzhou.personal.cr.aliyuncs.com
+    # 需要先登录，密码为：大写字母 + 小写字母 + 6位数字
+    image: gogoshine/mint-ai:latest
+    container_name: mint-ai
+    ports:
+      - "30000:30000"
+    volumes:
+      - /opt/1panel/apps/openresty/openresty/www/sites/app.gogoshine.com/index/output:/app/output  # 挂载配置文件目录
+      - /etc/localtime:/etc/localtime:ro  # 挂载主机时区
+      - /etc/timezone:/etc/timezone:ro    # 挂载时区名称（可选）
+    dns:
+      - 8.8.8.8     # Google 主 DNS
+      - 8.8.4.4     # Google 备用 DNS
+    mem_limit: 2G     # 内存限制
+    memswap_limit: 2G # 总内存（物理内存 + Swap）限制
+    cpus: '2'
+    oom_score_adj: -500  # 调整 OOM 杀手优先级
+    restart: unless-stopped  # 除非手动停止，否则总是重启容器    
+    #entrypoint: ["/bin/sh", "-c", "sleep 10000"]
