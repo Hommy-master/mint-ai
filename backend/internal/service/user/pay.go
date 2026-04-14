@@ -294,7 +294,7 @@ func calculateProductPrice(ctx context.Context, productID string, productValue i
 }
 
 // 根据充值金额计算赠送用户积分，返回实际赠送积分
-func calcRechargeWithBonus(amount int64) float64 {
+func calcRechargeWithBonus(amount int64) int64 {
 	// 充值金额，单位为分，例如5000表示50元
 
 	if amount >= 100000 { // 充值1000元以上，赠送200积分
@@ -335,8 +335,8 @@ func handlePaySuccess(ctx context.Context, orderInfo types.OrderInfo, resource t
 
 	// 2. 计算赠送积分
 	bonus := calcRechargeWithBonus(resource.Amount.Total)
-	rechargeAmount := float64(resource.Amount.Total) / 100.0 // 充值金额（元）
-	totalPoints := rechargeAmount + bonus                    // 总积分 = 充值金额 + 赠送积分
+	rechargeAmount := resource.Amount.Total / 100 // 充值金额（元）
+	totalPoints := rechargeAmount + bonus         // 总积分 = 充值金额 + 赠送积分
 
 	// 3. 使用事务处理，确保数据一致性
 	tx := db.NewDB().Begin()
@@ -353,7 +353,7 @@ func handlePaySuccess(ctx context.Context, orderInfo types.OrderInfo, resource t
 		ProductID:     string(orderInfo.ProductID),
 		OrderNO:       orderNO,
 		PayMethod:     string(consts.PayMethodWeChat),
-		Amount:        rechargeAmount, // 这里记录真实的订单金额，不包含赠送积分
+		Amount:        float64(rechargeAmount), // 这里记录真实的订单金额，不包含赠送积分
 		TransactionID: resource.TransactionID,
 		PayedAt:       time.Now(),
 		OrderStatus:   string(consts.OrderStatusPayed),
@@ -364,10 +364,10 @@ func handlePaySuccess(ctx context.Context, orderInfo types.OrderInfo, resource t
 
 		// 判断是否为唯一索引冲突 - 如果冲突，说明已经处理过，不需要重复处理
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			glog.Infof(ctx, "order already processed, userID:%d, orderNO:%s, transactionID:%s, price: %.2f, err: %+v",
+			glog.Infof(ctx, "order already processed, userID:%d, orderNO:%s, transactionID:%s, price: %d, err: %+v",
 				orderInfo.UserID, orderNO, resource.TransactionID, rechargeAmount, err)
 		} else {
-			glog.Errorf(ctx, "create order failed, userID:%d, orderNO:%s, transactionID:%s, price: %.2f, err: %v",
+			glog.Errorf(ctx, "create order failed, userID:%d, orderNO:%s, transactionID:%s, price: %d, err: %v",
 				orderInfo.UserID, orderNO, resource.TransactionID, rechargeAmount, err)
 		}
 
@@ -392,13 +392,13 @@ func handlePaySuccess(ctx context.Context, orderInfo types.OrderInfo, resource t
 	cache.GetInstance().Set(key, orderInfo, consts.PayTimeout)
 
 	// 8. 发送支付成功邮件（异步操作，失败不影响主流程）
-	helper.SendPaymentSuccessEmail(ctx, orderInfo.UserID, resource.OutTradeNo, rechargeAmount, resource.TransactionID, resource.SuccessTime)
-	glog.Infof(ctx, "handle pay success completed, orderNO: %s, rechargeAmount: %.2f, bonus: %.2f, totalPoints: %.2f",
+	helper.SendPaymentSuccessEmail(ctx, orderInfo.UserID, resource.OutTradeNo, float64(rechargeAmount), resource.TransactionID, resource.SuccessTime)
+	glog.Infof(ctx, "handle pay success completed, orderNO: %s, rechargeAmount: %d, bonus: %d, totalPoints: %d",
 		orderNO, rechargeAmount, bonus, totalPoints)
 }
 
 // 处理插件充值逻辑
-func processPluginRecharge(ctx context.Context, tx *gorm.DB, orderInfo types.OrderInfo, orderNO string, rechargeAmount, bonus, totalPoints float64) error {
+func processPluginRecharge(ctx context.Context, tx *gorm.DB, orderInfo types.OrderInfo, orderNO string, rechargeAmount, bonus, totalPoints int64) error {
 	// 根据产品类型决定如何处理
 	switch orderInfo.ProductID {
 	case consts.ProductVipYear, consts.ProductSVipMonth, consts.ProductSVipYear:
@@ -411,11 +411,11 @@ func processPluginRecharge(ctx context.Context, tx *gorm.DB, orderInfo types.Ord
 }
 
 // 处理普通插件充值逻辑
-func processNormalRecharge(ctx context.Context, tx *gorm.DB, orderInfo types.OrderInfo, orderNO string, rechargeAmount, bonus, totalPoints float64) error {
+func processNormalRecharge(ctx context.Context, tx *gorm.DB, orderInfo types.OrderInfo, orderNO string, rechargeAmount, bonus, totalPoints int64) error {
 	// 更新用户积分（使用原子操作，避免并发问题）
 	result := tx.Model(&model.User{}).Where("id = ?", orderInfo.UserID).Update("points", gorm.Expr("points + ?", totalPoints))
 	if result.Error != nil {
-		glog.Errorf(ctx, "update user points failed, userID: %d, orderNO: %s, totalPoints: %.2f, err: %v",
+		glog.Errorf(ctx, "update user points failed, userID: %d, orderNO: %s, totalPoints: %d, err: %v",
 			orderInfo.UserID, orderNO, totalPoints, result.Error)
 		return result.Error
 	}
@@ -454,7 +454,7 @@ func processNormalRecharge(ctx context.Context, tx *gorm.DB, orderInfo types.Ord
 }
 
 // 处理VIP升级逻辑
-func processVIPUpgrade(ctx context.Context, tx *gorm.DB, orderInfo types.OrderInfo, orderNO string, rechargeAmount float64) error {
+func processVIPUpgrade(ctx context.Context, tx *gorm.DB, orderInfo types.OrderInfo, orderNO string, rechargeAmount int64) error {
 	// 获取当前用户信息
 	var user model.User
 	if err := tx.Where("id = ?", orderInfo.UserID).First(&user).Error; err != nil {

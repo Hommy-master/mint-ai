@@ -10,7 +10,7 @@ type User struct {
 	Name        string    `json:"name" dc:"用户名"`                                             // 用户名，最大长度为255个字符
 	Email       string    `json:"email" dc:"邮箱"`                                             // 邮箱，最大长度为255个字符
 	Phone       string    `json:"phone" dc:"手机号"`                                            // 手机号，最大长度为20个字符
-	Points      float64   `json:"points" dc:"积分/资源点"`                                        // 单位：元
+	Points      int64     `json:"points" dc:"积分/资源点"`                                        // 整数积分
 	WeChatID    string    `json:"wechatID" dc:"关联微信, 即微信的OpenID"`                            // 微信ID，最大长度为255个字符
 	Role        string    `json:"role" dc:"角色，取值：normal: 普通用户, creator: 智能体创建者, admin: 管理员"` // 用户角色，主要用于控制哪些用户可以创建智能体
 	VIPLevel    int       `json:"vipLevel" dc:"VIP等级 (0:非VIP 1:VIP1 2:VIP2) "`               // VIP等级（0:非VIP 1:VIP1 2:VIP2）
@@ -65,7 +65,7 @@ type OrderInfo struct {
 type BalanceLog struct {
 	ID          uint      `json:"id" dc:"日志ID"`
 	OrderNO     string    `json:"orderNO" dc:"订单号"`
-	Points      float64   `json:"points" dc:"积分/资源点"`
+	Points      int64     `json:"points" dc:"积分/资源点"`
 	Description string    `json:"description" dc:"交易详情"`
 	OptAt       time.Time `json:"optAt" dc:"操作时间"`
 }

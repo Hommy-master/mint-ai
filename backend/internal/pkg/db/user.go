@@ -78,11 +78,11 @@ func UpdateUser(ctx context.Context, user *model.User, fields []string) error {
 // @param desc 积分消费描述，如：插件充值、新人奖励、视频插件调用等
 // @param orderNO 订单号，仅充值时，订单号不为空，其它情况没有订单号
 // @return 成功则返回nil，否则返回相应错误
-func UpdateUserPoints(ctx context.Context, userID uint, points float64, desc string, orderNO string) error {
+func UpdateUserPoints(ctx context.Context, userID uint, points int64, desc string, orderNO string) error {
 	// 1. 更新用户积分
 	result := NewDB().Model(&model.User{}).Where("id = ?", userID).Update("points", gorm.Expr("points + ?", points))
 	if result.Error != nil {
-		glog.Warningf(ctx, "update user points failed, err: %+v, userID: %d, points: %f", result.Error, userID, points)
+		glog.Warningf(ctx, "update user points failed, err: %+v, userID: %d, points: %d", result.Error, userID, points)
 		return fmt.Errorf("update user points failed: %v", result.Error)
 	}
 	if result.RowsAffected == 0 {
@@ -106,7 +106,7 @@ func UpdateUserPoints(ctx context.Context, userID uint, points float64, desc str
 }
 
 // 检查用户积分是否足够，如果足够，则返回nil，否则返回相应错误，注意：只有用户积分足够，才会返回用户信息
-func CheckUserPoints(ctx context.Context, price float64) (*model.User, error) {
+func CheckUserPoints(ctx context.Context, price int64) (*model.User, error) {
 	userID := ctx.Value("id").(uint)
 
 	// 1. 从数据库中查询用户信息
@@ -118,7 +118,7 @@ func CheckUserPoints(ctx context.Context, price float64) (*model.User, error) {
 
 	// 2. 检查用户积分是否足够
 	if u.Points < price {
-		glog.Warningf(ctx, "user points not enough, userID: %d, points: %.2f, price: %.2f", userID, u.Points, price)
+		glog.Warningf(ctx, "user points not enough, userID: %d, points: %d, price: %d", userID, u.Points, price)
 		return nil, fmt.Errorf("user points not enough")
 	}
 

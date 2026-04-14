@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"strings"
 	"time"
@@ -274,7 +275,7 @@ func UpdateUser(ctx context.Context, id uint, name *string) error {
 // @param ctx HTTP请求上下文
 // @param ctx HTTP请求上下文
 // @return 积分数，错误信息
-func Query(ctx context.Context) (float64, error) {
+func Query(ctx context.Context) (int64, error) {
 	id := ctx.Value("id").(uint)
 	usr, err := db.GetUserByID(ctx, id)
 	if err != nil {
@@ -291,7 +292,7 @@ func Query(ctx context.Context) (float64, error) {
 // @param points 待扣除的积分数
 // @param desc 扣除积分的理由，什么场景下扣除的积分
 // @return 错误信息
-func Deduct(ctx context.Context, points float64, desc string) error {
+func Deduct(ctx context.Context, points int64, desc string) error {
 	// 1. 查询用户信息
 	id := ctx.Value("id").(uint)
 	usr, err := db.GetUserByID(ctx, id)
@@ -308,7 +309,7 @@ func Deduct(ctx context.Context, points float64, desc string) error {
 	case 1: // VIP用户：8折
 		// 检查VIP是否在有效期内
 		if usr.VIPExpireAt.After(currentTime) {
-			actualPoints = points * 0.8
+			actualPoints = discountedPoints(points, 0.8)
 			discountDesc = "(VIP 8折)"
 		} else {
 			discountDesc = "(VIP已过期)"
@@ -316,7 +317,7 @@ func Deduct(ctx context.Context, points float64, desc string) error {
 	case 2, 3: // SVIP用户：6折
 		// 检查SVIP是否在有效期内
 		if usr.VIPExpireAt.After(currentTime) {
-			actualPoints = points * 0.6
+			actualPoints = discountedPoints(points, 0.6)
 			discountDesc = "(SVIP 6折)"
 		} else {
 			discountDesc = "(SVIP已过期)"
@@ -331,11 +332,19 @@ func Deduct(ctx context.Context, points float64, desc string) error {
 	// 4. 扣除积分 & 增加用户消费记录
 	err = db.UpdateUserPoints(ctx, usr.ID, -actualPoints, finalDesc, "")
 	if err != nil {
-		glog.Warningf(ctx, "Update user points failed, id: %d, original points: %f, actual points: %f, desc: %s, err: %+v",
+		glog.Warningf(ctx, "Update user points failed, id: %d, original points: %d, actual points: %d, desc: %s, err: %+v",
 			id, points, actualPoints, finalDesc, err)
 		return i.T(ctx, errcode.CodeInternalServerError)
 	}
 
-	glog.Infof(ctx, "Update user points success, id: %d, original points: %f, actual points: %f, desc: %s", id, points, actualPoints, finalDesc)
+	glog.Infof(ctx, "Update user points success, id: %d, original points: %d, actual points: %d, desc: %s", id, points, actualPoints, finalDesc)
 	return nil
+}
+
+func discountedPoints(points int64, rate float64) int64 {
+	val := int64(math.Round(float64(points) * rate))
+	if val < 1 {
+		return 1
+	}
+	return val
 }

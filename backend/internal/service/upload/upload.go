@@ -21,7 +21,7 @@ import (
 
 const (
 	maxUploadSize = 100 * 1024 * 1024 // 最大上传100MB，与服务器配置保持一致
-	price         = float64(0.08)
+	price         = int64(1)          // 积分改为整数后，上传最小扣费为1积分
 )
 
 // 支持的文件类型

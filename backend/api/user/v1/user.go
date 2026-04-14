@@ -149,13 +149,13 @@ type QueryReq struct {
 }
 
 type QueryRes struct {
-	Points float64 `json:"points" dc:"用户积分"`
+	Points int64 `json:"points" dc:"用户积分"`
 }
 
 type DeductReq struct {
 	g.Meta `path:"/points/deduct" method:"post" tags:"扣除用户积分" summary:"扣除用户积分" dc:"基于JWT登录态扣除当前用户积分"`
-	Points float64 `json:"points" v:"required|float|between:0,1000" dc:"当前消耗积分，必需是一个正数"`
-	Desc   string  `json:"desc" v:"required|length:1,128" dc:"当前消耗积分描述，是什么场景下消耗积分"`
+	Points int64  `json:"points" v:"required|integer|between:1,1000" dc:"当前消耗积分，必需是一个正整数"`
+	Desc   string `json:"desc" v:"required|length:1,128" dc:"当前消耗积分描述，是什么场景下消耗积分"`
 }
 
 type DeductRes struct {
