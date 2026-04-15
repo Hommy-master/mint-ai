@@ -1,0 +1,154 @@
+.footer {
+  padding: 0.4rem 0 0.2rem;
+  background: #141821;
+}
+
+.footer-wrap {
+  width: 91%;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.24rem;
+}
+
+.footer-wrap:last-child {
+  margin-top: 0.24rem;
+  justify-content: center;
+}
+
+.footer-item {
+  flex: 1;
+  min-width: 45%;
+}
+
+.footer-item-title {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.14rem;
+  line-height: 0.22rem;
+  margin-bottom: 0.12rem;
+}
+
+.footer-item-content {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.footer-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.footer-item-link {
+  font-size: 0.12rem;
+  line-height: 0.2rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.footer-item-link span {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.footer-item-link a {
+  color: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+}
+
+.footer-item-link a:hover {
+  text-decoration: underline;
+}
+
+.footer-item-qrcode {
+  width: 0.88rem;
+  height: 1.12rem;
+  padding: 0.08rem 0;
+  border-radius: 0.04rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.12rem;
+}
+
+.footer-item-qrcodeImg {
+  width: 0.68rem;
+  height: 0.68rem;
+  margin-bottom: 0.08rem;
+  object-fit: contain;
+}
+
+.footer-item-qrcodeText {
+  font-size: 0.12rem;
+  line-height: 0.18rem;
+  color: #4e5969;
+}
+
+.footer-beian {
+  font-size: 0.12rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+}
+
+.footer-beian:hover {
+  text-decoration: underline;
+}
+
+@media screen and (min-width: 945px) {
+  .footer {
+    padding: 48px 0 24px;
+  }
+
+  .footer-wrap {
+    width: 1200px;
+    flex-wrap: nowrap;
+    gap: 48px;
+  }
+
+  .footer-wrap:last-child {
+    margin-top: 32px;
+  }
+
+  .footer-item {
+    min-width: auto;
+    flex: 1;
+  }
+
+  .footer-item-title {
+    font-size: 14px;
+    line-height: 22px;
+    margin-bottom: 16px;
+  }
+
+  .footer-item-list {
+    gap: 8px;
+  }
+
+  .footer-item-link {
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  .footer-item-qrcode {
+    width: 88px;
+    height: 112px;
+    padding: 8px 0;
+    border-radius: 4px;
+    margin-top: 12px;
+  }
+
+  .footer-item-qrcodeImg {
+    width: 68px;
+    height: 68px;
+    margin-bottom: 8px;
+  }
+
+  .footer-item-qrcodeText {
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .footer-beian {
+    font-size: 12px;
+  }
+}

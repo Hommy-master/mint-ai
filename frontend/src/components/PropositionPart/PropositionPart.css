@@ -1,0 +1,130 @@
+.proposition_part {
+  padding-top: 0.42rem;
+  padding-bottom: 0.42rem;
+  background: #fff;
+}
+
+.proposition_imgList {
+  width: 92%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.2rem;
+}
+
+.proposition_img {
+  width: 0.52rem;
+  height: 0.6rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.5;
+}
+
+.proposition_img:hover,
+.proposition_img.active {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.proposition_content {
+  background: #f7f8fa;
+  border-radius: 0.08rem;
+  padding: 0.3rem 0.16rem;
+  width: 100%;
+}
+
+.proposition_content-img {
+  display: none;
+}
+
+.proposition_content-right {
+  text-align: center;
+}
+
+.proposition_content-svg {
+  width: 0.24rem;
+  height: 0.16rem;
+  margin-bottom: 0.04rem;
+}
+
+.proposition_content-t {
+  font-weight: 600;
+  font-size: 0.18rem;
+  line-height: 0.28rem;
+  color: #1d2129;
+  margin-bottom: 0.08rem;
+}
+
+.proposition_content-d {
+  font-size: 0.14rem;
+  line-height: 0.22rem;
+  color: #86909c;
+}
+
+@media screen and (min-width: 945px) {
+  .proposition_part {
+    padding-top: 120px;
+    padding-bottom: 120px;
+  }
+
+  .proposition_imgList {
+    width: 796px;
+    margin: 0 auto;
+    margin-bottom: 48px;
+  }
+
+  .proposition_img {
+    width: 120px;
+    height: 140px;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+  }
+
+  .proposition_img:hover,
+  .proposition_img.active {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  .proposition_content {
+    background: #fff;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 1200px;
+    margin: 0 auto;
+  }
+
+  .proposition_content-img {
+    display: block;
+    height: 292px;
+    width: 500px;
+    object-fit: contain;
+  }
+
+  .proposition_content-right {
+    width: 46%;
+    text-align: left;
+  }
+
+  .proposition_content-svg {
+    width: 24px;
+    height: 16px;
+    margin-bottom: 4px;
+  }
+
+  .proposition_content-t {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 32px;
+    margin-bottom: 8px;
+  }
+
+  .proposition_content-d {
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
