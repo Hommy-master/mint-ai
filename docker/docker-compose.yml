@@ -24,7 +24,7 @@ services:
       # capcut-mate / Web
       - CAPCUT_MATE_URL=http://mint-nginx
       - WEB_ROOT_DIR=/app/html
-      - WEB_ROOT_URL=http://192.168.3.165
+      - WEB_ROOT_URL=http://mint-nginx
 
       # 腾讯云 COS
       - COS_SECRET_ID=${COS_SECRET_ID}
