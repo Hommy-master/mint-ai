@@ -1,19 +1,97 @@
 services:
-  mint-ai:
-    image: gogoshine/mint-ai:latest
-    container_name: mint-ai
+  mint-worker:
+    image: gogoshine/mint-worker:latest
+    container_name: mint-worker
     ports:
-      - "30000:30000"
+      - "32001:30000"
+    environment:
+      # 基础（可在 .env 覆盖）
+      - DEBUG=${DEBUG:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+
+      # 大模型（密钥等来自 .env）
+      - LLM_PROVIDER=${LLM_PROVIDER:-aliyun}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-qwen3.6-plus}
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
+
+      # ASR（DashScope FunASR）；与 Settings 字段 ASR_* 一致
+      - ASR_PROVIDER=${ASR_PROVIDER:-funasr}
+      - ASR_API_KEY=${ASR_API_KEY}
+      - ASR_API_URL=${ASR_API_URL:-https://dashscope.aliyuncs.com/api/v1/services/audio/asr/transcription}
+      - ASR_TASK_URL=${ASR_TASK_URL:-https://dashscope.aliyuncs.com/api/v1/tasks}
+
+      # capcut-mate / Web
+      - CAPCUT_MATE_URL=http://mint-nginx
+      - WEB_ROOT_DIR=/app/html
+      - WEB_ROOT_URL=http://192.168.3.165
+
+      # 腾讯云 COS
+      - COS_SECRET_ID=${COS_SECRET_ID}
+      - COS_SECRET_KEY=${COS_SECRET_KEY}
+      - COS_BUCKET_NAME=${COS_BUCKET_NAME}
+      - COS_REGION=${COS_REGION:-ap-guangzhou}
     volumes:
-      - /opt/1panel/apps/openresty/openresty/www/sites/app.gogoshine.com/index/output:/app/output  # 挂载配置文件目录
+      - ./logs:/app/logs  # 挂载配置文件目录
+      - ./html:/app/html  # 挂载配置文件目录
       - /etc/localtime:/etc/localtime:ro  # 挂载主机时区
       - /etc/timezone:/etc/timezone:ro    # 挂载时区名称（可选）
     dns:
-      - 8.8.8.8     # Google 主 DNS
-      - 8.8.4.4     # Google 备用 DNS
-    mem_limit: 2G     # 内存限制
-    memswap_limit: 2G # 总内存（物理内存 + Swap）限制
-    cpus: '2'
+      - 8.8.8.8          # Google 主 DNS
+      - 8.8.4.4          # Google 备用 DNS
+    networks:
+      - mint-network
+    mem_limit: 4G        # 内存限制
+    memswap_limit: 4G    # 总内存（物理内存 + Swap）限制
+    cpus: '4'
     oom_score_adj: -500  # 调整 OOM 杀手优先级
-    restart: unless-stopped  # 除非手动停止，否则总是重启容器    
-    #entrypoint: ["/bin/sh", "-c", "sleep 10000"]
+    restart: unless-stopped  # 除非手动停止，否则总是重启容器
+    
+  mint-capcut-mate:
+    image: gogoshine/capcut-mate:latest
+    container_name: mint-capcut-mate
+    platform: linux/amd64
+    ports:
+      - "32002:30000"
+    volumes:
+      - ./html/output:/app/output  # 挂载配置文件目录
+    environment:
+      # 草稿下载URL
+      - DRAFT_URL=http://localhost/openapi/capcut-mate/v1/get_draft
+      # 用于将容器内部的文件路径转成URL，本质是将/app/替换成DOWNLOAD_URL得到下载路径
+      - DOWNLOAD_URL=http://localhost
+      # 草稿提示URL
+      - TIP_URL=https://docs.jcaigc.cn
+      # 文件下载大小限制（字节），默认1GB（1073741824）
+      - DOWNLOAD_FILE_SIZE_LIMIT=1073741824
+    networks:
+      - mint-network
+    mem_limit: 1G     # 内存限制
+    memswap_limit: 1G # 总内存（物理内存 + Swap）限制
+    cpus: '1'       # CPU使用率限制为150%，即容器最多可以使用1.5个完整的CPU核心
+    oom_score_adj: -500  # 调整 OOM 杀手优先级
+    restart: unless-stopped  # 除非手动停止，否则总是重启容器
+
+  mint-nginx:
+    image: gogoshine/nginx:latest
+    container_name: mint-nginx
+    ports:
+      - "80:80"
+    environment:
+      - PROXY_PASS_URL_1=http://mint-capcut-mate:30000/openapi/capcut-mate/
+      - PROXY_LOCATION_1=/openapi/capcut-mate/
+      - PROXY_PASS_URL_2=http://mint-worker:30000/openapi/mint-worker/
+      - PROXY_LOCATION_2=/openapi/mint-worker/
+    volumes:
+      - ./html:/usr/share/nginx/html
+    networks:
+      - mint-network
+    mem_limit: 1G     # 内存限制
+    memswap_limit: 1G # 总内存（物理内存 + Swap）限制
+    cpus: '1'         # CPU使用率限制为150%，即容器最多可以使用1.5个完整的CPU核心
+    oom_score_adj: -500  # 调整 OOM 杀手优先级
+    restart: unless-stopped  # 除非手动停止，否则总是重启容器 
+
+networks:
+  mint-network:
+    driver: bridge
