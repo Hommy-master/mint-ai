@@ -1,0 +1,58 @@
+// CSS 自定义属性（:root 变量）定义
+// 使用 CSS Variables 可在运行时动态修改主题色
+@charset "UTF-8";
+
+:root {
+  // 主色调 - 青绿色系（与背景图片保持一致）
+  --primary-color: #5cb8a6;
+  --primary-light: #7dd3c0;
+  --primary-lighter: #a8e6d9;
+  --primary-dark: #4a9a8a;
+
+  // 状态色
+  --success-color: #67c23a;
+  --success-light: #85ce61;
+  --success-lighter: #a6d98c;
+  --warning-color: #e6a23c;
+  --danger-color: #f56c6c;
+  --info-color: #909399;
+
+  // 状态标签背景色
+  --status-recording-bg: #f0f9eb;
+  --status-recording-text: var(--success-color);
+  --status-completed-bg: #f0f9eb;
+  --status-completed-text: var(--success-color);
+  --status-failed-bg: #fef0f0;
+  --status-failed-text: var(--danger-color);
+
+  // 文字颜色
+  --text-primary: #1a1a1a;
+  --text-regular: #606266;
+  --text-secondary: #909399;
+  --text-placeholder: #a8abb2;
+
+    /* 定义滚动条颜色变量 */
+  --scrollbar-track: #f1f1f1;
+  --scrollbar-thumb: #c1c1c1;
+  --scrollbar-thumb-hover: #a8a8a8;
+  --scrollbar-width: 12px;
+  --scrollbar-border-radius: 6px;
+
+  /* 边框 */
+  --border-color: #dcdfe6;
+  --border-light: #ebeef5;
+  --border-radius: 16px;
+
+  /* 背景 */
+  --bg-white: #ffffff;
+  --bg-light: #f5f7fa;
+  --bg-page: #f0f2f5;
+
+  /* 阴影 */
+  --shadow-primary: 0 4px 12px rgba(from var(--primary-color) r g b / 0.3);
+  --shadow-primary-hover: 0 6px 16px rgba(from var(--primary-color) r g b / 0.4);
+
+  /* 定义渐变色 */
+  --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  --gradient-primary-hover: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-lighter) 100%);
+}
